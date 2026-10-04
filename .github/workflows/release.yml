@@ -1,0 +1,67 @@
+name: Release
+
+# Tag vX.Y.Z (= the version in filex-app.json and package.json) -> unit
+# tests, the DOOM engine and ui.zip built from scratch, a check that ui.zip
+# is the very package filex-app.json pins (ui.bundle.sha256; the build is
+# reproducible), then ui.zip + ui.zip.sha256 + filex-app.json attached to the
+# GitHub release, whose notes are the version's CHANGELOG.md section
+# (scripts/release-notes.mjs).
+#
+# filex installs from `BRF-Tech/filex-retro` at a tag: it reads
+# filex-app.json from the repository, downloads ui.bundle.url ({tag} = the
+# tag) and refuses a package whose sha256 is not ui.bundle.sha256.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: install, as locked
+        run: npm ci --no-audit --no-fund
+      - name: unit tests
+        run: npm test
+      - name: version must match the tag
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          VER="$(node -p "require('./filex-app.json').version")"
+          PKG="$(node -p "require('./package.json').version")"
+          test "$TAG" = "$VER" || { echo "filex-app.json version $VER != tag $TAG"; exit 1; }
+          test "$TAG" = "$PKG" || { echo "package.json version $PKG != tag $TAG"; exit 1; }
+      # The release's body is this version's CHANGELOG.md section: filex shows
+      # it to an administrator under "Release notes" when it offers the
+      # update. No dated section, no release.
+      - name: CHANGELOG.md says what this version changes
+        run: node scripts/release-notes.mjs "$GITHUB_REF_NAME" > /dev/null
+      - name: the manifest points at this repository's releases
+        run: |
+          URL="$(node -p "require('./filex-app.json').ui.bundle.url")"
+          test "$URL" = "https://github.com/${GITHUB_REPOSITORY}/releases/download/{tag}/ui.zip" || { echo "ui.bundle.url $URL is not this repository's release"; exit 1; }
+      - name: the DOOM engine, in the pinned Emscripten image
+        run: bash scripts/build-engine.sh
+      - name: build (fails unless ui.zip is the package filex-app.json pins)
+        run: bash scripts/build.sh --check
+      - name: release files
+        run: |
+          sha256sum -c ui.zip.sha256
+          mkdir -p dist
+          cp ui.zip ui.zip.sha256 filex-app.json dist/
+          node scripts/release-notes.mjs "$GITHUB_REF_NAME" > dist/release-notes.md
+      - name: release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: dist/release-notes.md
+          files: |
+            dist/ui.zip
+            dist/ui.zip.sha256
+            dist/filex-app.json

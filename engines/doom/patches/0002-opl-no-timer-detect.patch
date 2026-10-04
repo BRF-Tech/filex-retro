@@ -1,0 +1,19 @@
+--- a/opl/opl.c
++++ b/opl/opl.c
+@@ -82,8 +82,16 @@
+     driver = _driver;
+     init_stage_reg_writes = 1;
+ 
++#ifdef __EMSCRIPTEN__
++    // filex-retro: OPL_Detect waits (OPL_Delay) for the emulator's audio
++    // callback to fire the chip's timer. In the browser that callback runs
++    // on the same thread as this wait, so it never comes. The emulated
++    // chip is always there, and it is an OPL3.
++    result1 = result2 = OPL_INIT_OPL3;
++#else
+     result1 = OPL_Detect();
+     result2 = OPL_Detect();
++#endif
+     if (result1 == OPL_INIT_NONE || result2 == OPL_INIT_NONE)
+     {
+         printf("OPL_Init: No OPL detected using '%s' driver.\n", _driver->name);

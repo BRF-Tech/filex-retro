@@ -1,0 +1,32 @@
+--- a/dg/i_sound.c
++++ b/dg/i_sound.c
+@@ -131,7 +131,14 @@
+ static void InitMusicModule(void)
+ {
+ #ifdef FEATURE_SOUND
+-    music_module = &DG_music_module;
++    // filex-retro: music is Chocolate Doom's OPL (Adlib / Sound Blaster
++    // FM) emulation, mixed in by SDL_mixer; there is no MIDI synthesiser
++    // in the browser to hand SDL_mixer's own music module.
++    if (SndDeviceInList(snd_musicdevice, music_opl_module.sound_devices,
++                        music_opl_module.num_sound_devices))
++    {
++        music_module = &music_opl_module;
++    }
+ #endif /* FEATURE_SOUND */
+ }
+ 
+@@ -308,9 +315,11 @@
+ 
+ void I_InitMusic(void)
+ {
+-    if(music_module != NULL)
++    // filex-retro: a module that did not start (no GENMIDI lump) is
++    // dropped, so the game goes on without music.
++    if(music_module != NULL && !music_module->Init())
+     {
+-        music_module->Init();
++        music_module = NULL;
+     }
+ }
+ 

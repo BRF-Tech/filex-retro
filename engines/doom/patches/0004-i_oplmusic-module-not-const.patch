@@ -1,0 +1,12 @@
+--- a/opl/i_oplmusic.c
++++ b/opl/i_oplmusic.c
+@@ -1777,7 +1777,8 @@
+     SNDDEVICE_SB,
+ };
+ 
+-const music_module_t music_opl_module =
++// filex-retro: not const, as doomgeneric's i_sound.h declares it.
++music_module_t music_opl_module =
+ {
+     music_opl_devices,
+     arrlen(music_opl_devices),

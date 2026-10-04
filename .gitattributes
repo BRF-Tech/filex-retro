@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.png binary
+*.wasm binary
+*.zip binary
+*.wad binary
+*.jsdos binary
+*.fxdoom binary

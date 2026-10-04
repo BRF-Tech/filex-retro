@@ -1,0 +1,18 @@
+dist/
+ui.zip
+ui.zip.sha256
+node_modules/
+*.log
+/.cache/
+/build/
+/.idea/
+/.vscode/
+*.swp
+.DS_Store
+/.claude/worktrees/
+
+# Game data never enters this repository or ui.zip (see README "No game data").
+*.wad
+*.WAD
+*.jsdos
+*.fxdoom

@@ -1,0 +1,70 @@
+Retro (filex-retro)
+Copyright (c) 2026 BRF Tech
+
+Retro is licensed under the GNU General Public License, version 2 only
+(GPL-2.0-only); see LICENSE. It is a separate program from filex: it talks to
+filex only through filex's app interface bridge, and filex's own licence (MIT)
+is not affected.
+
+The release package (ui.zip) contains Retro's own code (src/) and the
+components below. The full source of the DOOM engine (items 1-4) is this
+repository at the release's tag: it is built from the pinned upstream
+commits, with this repository's patches, by engines/doom/build.sh in the
+pinned Emscripten image (emscripten/emsdk:6.0.10). The DOS engine (item 6)
+is packed unchanged, as its authors published it; its source is named there.
+
+1. doomgeneric (https://github.com/ozkl/doomgeneric), commit
+   dcb7a8dbc7a16ce3dda29382ac9aae9d77d21284. The DOOM engine, from Chocolate
+   Doom, with a small platform interface. Copyright (C) 1993-1996 Id Software,
+   Inc.; Copyright (C) 2005-2014 Simon Howard; and the other authors named in
+   its files. GNU General Public License, version 2 or later (LICENSE).
+   Changed by this project: engines/doom/patches/0001 (music through the OPL
+   module; a music module that does not start is dropped). Its platform file
+   for the browser is replaced by engines/doom/retro_platform.c.
+
+2. Chocolate Doom (https://github.com/chocolate-doom/chocolate-doom), tag
+   chocolate-doom-3.1.1, commit 410d96855b5df5410ff591a90efeafa889119224. Only
+   its OPL music: src/i_oplmusic.c, src/midifile.c and opl/ (with the Nuked
+   OPL3 emulator, Copyright (C) 2013-2018 Alexey Khokholov). Copyright (C)
+   2005-2014 Simon Howard and the other authors named in its files. GNU General
+   Public License, version 2 or later (LICENSE). Changed by this project:
+   engines/doom/patches/0002-0004 (no timer-based chip detection in the
+   browser, a music switch, a declaration made to match doomgeneric's).
+
+3. SDL 2.32.10 and SDL_mixer 2.8.0 (https://www.libsdl.org), as Emscripten's
+   ports build them, linked into the engine for sound. Copyright (C)
+   1997-2025 Sam Lantinga. zlib licence (licenses/SDL2.txt,
+   licenses/SDL2_mixer.txt).
+
+4. Emscripten's runtime and C library (https://emscripten.org), linked into
+   the engine (engines/doom/retro-doom.js and .wasm). Emscripten: MIT licence
+   (licenses/emscripten.txt). musl libc: MIT licence (licenses/musl.txt).
+
+5. @brftech/filex-app-ui 0.50.0 (vendor/filex-app-ui.iife.js), the filex
+   app interface SDK. Copyright (c) 2026 BRF Tech. MIT licence
+   (licenses/filex-app-ui.txt).
+
+6. js-dos emulators 8.5.1 (dos/emulators/: emulators.js, wdosbox.js and .wasm,
+   wlibzip.js and .wasm), the DOS player's engine, packed exactly as
+   published on npm as "emulators" 8.5.1 (package-lock.json pins its
+   integrity). Copyright (C) Alexander Guryanov (caiiiycuk). GNU General
+   Public License, version 2 (LICENSE). Its source is
+   https://github.com/caiiiycuk/emulators at tag v8.5.1 (commit
+   fc8441e4af7a9cfa3a147f3b54c1aa9c0ab2198c) with its submodules. It
+   contains:
+   - DOSBox, as js-dos's fork builds it (https://github.com/js-dos/dosbox,
+     that repository's native/dosbox submodule). Copyright (C) The DOSBox
+     Team. GNU General Public License, version 2 or later (LICENSE).
+   - libzip 1.5 (native/libzip in that repository). Copyright (C) 1999-2017
+     Dieter Baron and Thomas Klausner. BSD 3-clause licence
+     (licenses/libzip.txt).
+   - zlib, as Emscripten's port builds it. Copyright (C) 1995-2022 Jean-loup
+     Gailly and Mark Adler. zlib licence (licenses/zlib.txt).
+   - core-js 3.30 (in emulators.js). Copyright (c) 2014-2023 Denis
+     Pushkarev. MIT licence (licenses/core-js.txt).
+   - Emscripten's runtime and C library (item 4).
+
+No game data is part of Retro or of its package: no WAD (not even Freedoom),
+no DOS game. "DOOM" is a trademark of id Software; Retro is not affiliated
+with or endorsed by id Software, and "DOOM-engine player" only says what the
+player is compatible with.

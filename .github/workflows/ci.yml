@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: install, as locked
+        run: npm ci --no-audit --no-fund
+      - name: unit tests
+        run: npm test
+      - name: the manifest and package.json name the same version
+        run: |
+          VER="$(node -p "require('./filex-app.json').version")"
+          PKG="$(node -p "require('./package.json').version")"
+          test "$VER" = "$PKG" || { echo "filex-app.json version $VER != package.json $PKG"; exit 1; }
+      - name: the DOOM engine, in the pinned Emscripten image
+        run: bash scripts/build-engine.sh
+      # The build is reproducible, so a stamped sha256 that is not this tree's
+      # package is a real mismatch: run scripts/build.sh --stamp and commit.
+      - name: build (the package must be the one filex-app.json pins)
+        run: bash scripts/build.sh --check
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ui
+          path: |
+            ui.zip
+            ui.zip.sha256

@@ -1,0 +1,21 @@
+--- a/opl/opl_sdl.c
++++ b/opl/opl_sdl.c
+@@ -162,8 +162,18 @@
+ 
+ // Call the OPL emulator code to fill the specified buffer.
+ 
++// filex-retro: set by the player's music switch (retro_platform.c). Off,
++// the chip is not rendered at all (it is the costly part) and adds nothing
++// to the mix; the song's timing still runs, so the music comes back in time.
++extern int retro_opl_muted;
++
+ static void FillBuffer(uint8_t *buffer, unsigned int nsamples)
+ {
++    if (retro_opl_muted)
++    {
++        return;
++    }
++
+     // This seems like a reasonable assumption.  mix_buffer is
+     // 1 second long, which should always be much longer than the
+     // SDL mix buffer.
