@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Packs ui.zip: the interface (src/), the engines (build/engines for the
-// DOOM engine, js-dos 8.5.1's emulators from node_modules for DOS), the
+// DOOM engine, js-dos 8.5.2's emulators from node_modules for DOS), the
 // filex app SDK and the licences, in a zip that is the same, byte for byte,
 // on every machine (src/shell/zip.js: sorted entries, every entry stored,
 // a fixed date, no extra fields; text files with LF line ends).

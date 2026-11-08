@@ -10,11 +10,11 @@ The release package (ui.zip) contains Retro's own code (src/) and the
 components below. The full source of the DOOM engine (items 1-4) is this
 repository at the release's tag: it is built from the pinned upstream
 commits, with this repository's patches, by engines/doom/build.sh in the
-pinned Emscripten image (emscripten/emsdk:6.0.10). The DOS engine (item 6)
+pinned Emscripten image (emscripten/emsdk:7.0.0). The DOS engine (item 6)
 is packed unchanged, as its authors published it; its source is named there.
 
 1. doomgeneric (https://github.com/ozkl/doomgeneric), commit
-   dcb7a8dbc7a16ce3dda29382ac9aae9d77d21284. The DOOM engine, from Chocolate
+   e257a09527062bfb986b6e5e0780839b6cbd5b71. The DOOM engine, from Chocolate
    Doom, with a small platform interface. Copyright (C) 1993-1996 Id Software,
    Inc.; Copyright (C) 2005-2014 Simon Howard; and the other authors named in
    its files. GNU General Public License, version 2 or later (LICENSE).
@@ -44,13 +44,13 @@ is packed unchanged, as its authors published it; its source is named there.
    app interface SDK. Copyright (c) 2026 BRF Tech. MIT licence
    (licenses/filex-app-ui.txt).
 
-6. js-dos emulators 8.5.1 (dos/emulators/: emulators.js, wdosbox.js and .wasm,
+6. js-dos emulators 8.5.2 (dos/emulators/: emulators.js, wdosbox.js and .wasm,
    wlibzip.js and .wasm), the DOS player's engine, packed exactly as
-   published on npm as "emulators" 8.5.1 (package-lock.json pins its
+   published on npm as "emulators" 8.5.2 (package-lock.json pins its
    integrity). Copyright (C) Alexander Guryanov (caiiiycuk). GNU General
    Public License, version 2 (LICENSE). Its source is
-   https://github.com/caiiiycuk/emulators at tag v8.5.1 (commit
-   fc8441e4af7a9cfa3a147f3b54c1aa9c0ab2198c) with its submodules. It
+   https://github.com/caiiiycuk/emulators at tag v8.5.2 (commit
+   6bbf0925d221a7304ea8e0dda1e89b8dc01569b2) with its submodules. It
    contains:
    - DOSBox, as js-dos's fork builds it (https://github.com/js-dos/dosbox,
      that repository's native/dosbox submodule). Copyright (C) The DOSBox

@@ -1,7 +1,7 @@
 {
   "manifest_version": 1,
   "name": "retro",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "filex": ">=0.51.0",
   "label": {
     "en": "Retro",
@@ -57,7 +57,7 @@
   "ui": {
     "bundle": {
       "url": "https://github.com/BRF-Tech/filex-retro/releases/download/{tag}/ui.zip",
-      "sha256": "ea2dbd942ef5ba689a27a6b5e7c4d4ef0e542c246abdcb4620fa509f468bfba0"
+      "sha256": "69ceefef964961d1db866bc1dd401955562ac0b52eefd2d2dc87096b6c1de394"
     },
     "csp": [
       "wasm-unsafe-eval"

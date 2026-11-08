@@ -1,4 +1,4 @@
-// Loads js-dos 8.5.1's `emulators` from this app's own package and starts
+// Loads js-dos 8.5.2's `emulators` from this app's own package and starts
 // DOSBox in a worker.
 //
 // Under filex's policy for app pages (no 'unsafe-eval', `worker-src blob:`,

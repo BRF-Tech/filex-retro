@@ -7,7 +7,8 @@
 //     colours (the SDK paints `--fe-*` onto <html>),
 //   - draws the frame's parts: a bar (title, status, the player's buttons,
 //     Settings), the stage the player draws its screen on, and one overlay
-//     for the Start screen and for messages,
+//     for the Start screen and for messages (also a question with a list
+//     to pick from, like the DOS player's program picker),
 //   - holds the "Start" gesture: the click that starts a game also starts
 //     its sound (an AudioContext made inside that click) and gives the
 //     screen the keyboard,
@@ -117,17 +118,35 @@ export async function startShell(opts = {}) {
 
   // ---- the overlay: Start, messages ----------------------------------------
   let overlaySpec = null;
+  // The message on screen, as drawn (its Escape).
+  let shown = null;
   const renderOverlay = () => {
     overlay.replaceChildren();
+    shown = null;
     if (!overlaySpec) {
       overlay.hidden = true;
       return;
     }
     const s = typeof overlaySpec.spec === 'function' ? overlaySpec.spec(shell.t) : overlaySpec.spec;
-    const card = make(doc, 'div', 'rx-card' + (s.tone === 'error' ? ' rx-card--error' : ''));
+    shown = s;
+    const options = s.options || [];
+    const cls = ['rx-card'];
+    if (s.tone === 'error') cls.push('rx-card--error');
+    if (options.length) cls.push('rx-card--options');
+    if (s.className) cls.push(s.className);
+    const card = make(doc, 'div', cls.join(' '));
+    // A list to pick from is a question the person answers before going on.
+    if (options.length) {
+      card.setAttribute('role', 'dialog');
+      card.setAttribute('aria-modal', 'true');
+    }
     if (s.title) {
       const h = make(doc, 'h2', 'rx-card__title');
       h.textContent = s.title;
+      if (options.length) {
+        h.id = 'rx-card-title';
+        card.setAttribute('aria-labelledby', h.id);
+      }
       card.append(h);
     }
     for (const line of [].concat(s.text || [], s.lines || [])) {
@@ -136,14 +155,39 @@ export async function startShell(opts = {}) {
       p.textContent = line;
       card.append(p);
     }
-    const row = make(doc, 'div', 'rx-card__actions');
     let first = null;
+    if (options.length) {
+      const list = make(doc, 'div', 'rx-card__options', { role: 'list' });
+      let current = null;
+      for (const o of options) {
+        const b = make(doc, 'button', 'rx-btn rx-option', { type: 'button', role: 'listitem' });
+        if (o.id !== undefined && o.id !== null) b.dataset.option = o.id;
+        const name = make(doc, 'span', 'rx-option__label');
+        name.textContent = o.label;
+        b.append(name);
+        if (o.detail) {
+          const detail = make(doc, 'span', 'rx-option__detail');
+          detail.textContent = o.detail;
+          b.append(detail);
+        }
+        if (o.current) {
+          b.setAttribute('aria-current', 'true');
+          if (!current) current = b;
+        }
+        b.addEventListener('click', () => o.onClick && o.onClick());
+        list.append(b);
+        if (!first) first = b;
+      }
+      if (current) first = current;
+      card.append(list);
+    }
+    const row = make(doc, 'div', 'rx-card__actions');
     if (overlaySpec.onStart) {
       const b = make(doc, 'button', 'rx-btn rx-btn--primary rx-btn--start', { type: 'button', 'data-action': 'start' });
       b.textContent = s.startLabel || t('shell.start');
       b.addEventListener('click', overlaySpec.onStart);
       row.append(b);
-      first = b;
+      if (!first) first = b;
     }
     for (const a of s.actions || []) {
       const b = make(doc, 'button', 'rx-btn' + (a.primary ? ' rx-btn--primary' : ''), { type: 'button' });
@@ -163,6 +207,12 @@ export async function startShell(opts = {}) {
     overlay.hidden = false;
     if (first && overlaySpec.focus !== false) first.focus();
   };
+  overlay.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && shown && typeof shown.onEscape === 'function') {
+      e.preventDefault();
+      shown.onEscape();
+    }
+  });
 
   // ---- settings ------------------------------------------------------------
   let values = defaultSettings(schema);
@@ -306,7 +356,18 @@ export async function startShell(opts = {}) {
         renderOverlay();
       });
     },
-    /** A message over the stage: {title, text, lines, tone: 'info'|'error', actions: [{id, label, onClick, primary}]}. */
+    /**
+     * A message over the stage (`spec`, or `spec(t)`, re-run when the
+     * language changes): {title, text, lines, tone: 'info'|'error',
+     * actions: [{id, label, onClick, primary}]}, and for a question with a
+     * list to pick from:
+     *   options   - [{id, label, detail?, current?, onClick}], drawn between
+     *               the text and the actions (`data-option` = id); the
+     *               current one is marked and takes the keyboard, else the
+     *               first does
+     *   onEscape  - what Escape does (nothing without it)
+     *   className - the player's own class on the card, for its own look
+     */
     showMessage(spec, { focus = true } = {}) {
       overlaySpec = { spec, focus };
       renderOverlay();
@@ -348,8 +409,13 @@ export async function startShell(opts = {}) {
       localeListeners.add(fn);
       return () => localeListeners.delete(fn);
     },
-    /** Unsaved changes: filex asks before the person leaves them. */
+    /**
+     * Unsaved changes: filex asks before the person leaves them. Also
+     * `<html data-rx-dirty>`, written on every call, for the person's
+     * browser tools and the tests; the shell is the only one that writes it.
+     */
     setDirty(on) {
+      html.dataset.rxDirty = String(!!on);
       if (!!on === dirty) return;
       dirty = !!on;
       if (shell.fx) shell.fx.dirty(dirty);

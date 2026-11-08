@@ -4,7 +4,7 @@
 # Runs inside the pinned Emscripten image, with this repository at $SRC:
 #
 #   docker run --rm -v "$PWD:/src:ro" -v <work>:/build -v <out>:/out \
-#     emscripten/emsdk:6.0.10 bash /src/engines/doom/build.sh
+#     emscripten/emsdk:7.0.0 bash /src/engines/doom/build.sh
 #
 # (scripts/build-engine.sh does exactly that.) Inputs, all pinned:
 #   - ozkl/doomgeneric at DG_COMMIT: the engine (Chocolate Doom's DOOM code
@@ -24,10 +24,10 @@ set -euo pipefail
 SRC=${SRC:-/src}
 WORK=${WORK:-/build}
 OUT=${OUT:-/out}
-EMSDK_VERSION=6.0.10
+EMSDK_VERSION=7.0.0
 
 DG_REPO=https://github.com/ozkl/doomgeneric.git
-DG_COMMIT=dcb7a8dbc7a16ce3dda29382ac9aae9d77d21284
+DG_COMMIT=e257a09527062bfb986b6e5e0780839b6cbd5b71
 CD_REPO=https://github.com/chocolate-doom/chocolate-doom.git
 CD_COMMIT=410d96855b5df5410ff591a90efeafa889119224
 

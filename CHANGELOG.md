@@ -4,7 +4,35 @@ All notable changes to this app are written here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.2.0] - 2026-11-08
+
+The engines move to their newest upstream versions. Nothing changes in how
+Retro looks or plays, and it still needs filex 0.51.0 or newer.
+
+### Changed
+
+- The DOOM engine is compiled with Emscripten 7.0.0 (was 6.0.10), and the
+  Emscripten image is pinned by its digest as well as its tag. SDL 2.32.10
+  and SDL_mixer 2.8.0 are the same ports as before.
+- doomgeneric moves to `e257a09` (was `dcb7a8d`). The new commits change
+  only the Windows and Linux console builds, which Retro does not use; the
+  patches apply unchanged.
+- The DOS player runs js-dos 8.5.2's `emulators` (was 8.5.1). 8.5.2 fixes
+  DOSBox-X's mouse and keyboard; Retro packs the single-threaded DOSBox,
+  whose files are byte for byte the same as in 8.5.1.
+
+### Changed (internal)
+
+- The shell owns two things the DOS player did itself: the program picker
+  is now the shell's message with a list of options (`showMessage`
+  `options`), and only `shell.setDirty` writes `<html data-rx-dirty>`.
+  Nothing changes for the person.
+- Test tools: vitest 5.1.0, happy-dom 21.0.4, Playwright 1.65.0 in the
+  end-to-end tests (with the matching Playwright image), Alpine 3.24 for the
+  end-to-end fixtures.
+- The GitHub Actions are pinned by commit: actions/checkout 7.0.1,
+  actions/setup-node 7.1.0, actions/upload-artifact 7.0.2,
+  softprops/action-gh-release 3.0.4.
 
 ## [0.1.0] - 2026-10-04
 

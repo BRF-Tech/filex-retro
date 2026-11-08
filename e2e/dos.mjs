@@ -218,9 +218,14 @@ export function dosScenarios(h) {
     out.phase = 'pick';
     let { page, frame, rec, P } = await h.openApp(ctx, file, 'dos');
     out.pick = await h.look(frame);
-    out.items = await frame.evaluate(() => [...document.querySelectorAll('.rx-dos-pick__item')].map((x) => x.querySelector('.rx-dos-pick__name').textContent));
-    check(where, out.pick.state === 'pick' && JSON.stringify(out.items) === JSON.stringify(['DOSPROBE.COM', 'TOOLS\\OTHER.COM']), 'picker ' + JSON.stringify({ ...out.pick, items: out.items }));
-    await frame.click('.rx-dos-pick__item[data-program="DOSPROBE.COM"]');
+    // The picker is the shell's message with a list of options.
+    out.items = await frame.evaluate(() => [...document.querySelectorAll('.rx-overlay .rx-dos-pick .rx-option')].map((x) => x.querySelector('.rx-option__label').textContent));
+    check(
+      where,
+      out.pick.state === 'pick' && /Which program starts the game\?/.test(out.pick.overlay || '') && JSON.stringify(out.items) === JSON.stringify(['DOSPROBE.COM', 'TOOLS\\OTHER.COM']),
+      'picker ' + JSON.stringify({ ...out.pick, items: out.items }),
+    );
+    await frame.click('.rx-option[data-option="DOSPROBE.COM"]');
     out.ready = await h.waitState(frame, ['ready']);
     check(where, /Starts DOSPROBE\.COM\./.test(out.ready.overlay || ''), 'start screen ' + JSON.stringify(out.ready));
     out.saveReady = await button(frame, 'save');
@@ -236,10 +241,16 @@ export function dosScenarios(h) {
     check(where, out.remembered.state === 'ready' && /Starts DOSPROBE\.COM\./.test(out.remembered.overlay || ''), 'not remembered ' + JSON.stringify(out.remembered));
     await frame.click('[data-action="change"]');
     out.change = await h.waitState(frame, ['pick']);
-    out.current = await frame.evaluate(() => [...document.querySelectorAll('.rx-dos-pick__item[aria-current="true"]')].map((x) => x.dataset.program));
+    out.current = await frame.evaluate(() => [...document.querySelectorAll('.rx-option[aria-current="true"]')].map((x) => x.dataset.option));
     check(where, JSON.stringify(out.current) === '["DOSPROBE.COM"]', 'current program ' + JSON.stringify(out.current));
     await frame.click('[data-action="pick-back"]');
     await h.waitState(frame, ['ready']);
+    // Escape goes back too.
+    await frame.click('[data-action="change"]');
+    await h.waitState(frame, ['pick']);
+    await frame.press('.rx-option[aria-current="true"]', 'Escape');
+    out.escaped = await h.waitState(frame, ['ready']);
+    check(where, /Starts DOSPROBE\.COM\./.test(out.escaped.overlay || ''), 'back on Escape ' + JSON.stringify(out.escaped));
 
     out.phase = 'play';
     if (!(await start(frame, where))) return;

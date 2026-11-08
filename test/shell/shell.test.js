@@ -39,6 +39,7 @@ const viewStrings = { en: { 'test.music': 'Music', 'test.sfx': 'Sound effects' }
 beforeEach(() => {
   document.body.innerHTML = '';
   delete document.documentElement.dataset.rxState;
+  delete document.documentElement.dataset.rxDirty;
 });
 
 describe('startShell', () => {
@@ -146,6 +147,104 @@ describe('startShell', () => {
     shell.setDirty(true);
     shell.setDirty(false);
     expect(fx.calls.filter((c) => c[0] === 'dirty')).toEqual([['dirty', true], ['dirty', false]]);
+  });
+
+  it('shows unsaved changes as <html data-rx-dirty>, written on every call', async () => {
+    const fx = fakeFx();
+    const shell = await startShell({ view: 'dos', connect: async () => fx });
+    const html = document.documentElement;
+    expect(html.dataset.rxDirty).toBe(undefined);
+    shell.setDirty(false);
+    expect(html.dataset.rxDirty).toBe('false');
+    shell.setDirty(true);
+    expect(html.dataset.rxDirty).toBe('true');
+    expect(shell.dirty).toBe(true);
+    shell.setDirty(0);
+    expect(html.dataset.rxDirty).toBe('false');
+    expect(fx.calls.filter((c) => c[0] === 'dirty')).toEqual([['dirty', true], ['dirty', false]]);
+  });
+});
+
+describe('showMessage with options', () => {
+  const card = () => document.querySelector('.rx-overlay .rx-card');
+  const options = () => [...document.querySelectorAll('.rx-overlay .rx-option')];
+
+  it('lists the options between the text and the actions, the current one marked and focused', async () => {
+    const shell = await startShell({ view: 'dos', connect: async () => fakeFx() });
+    const seen = [];
+    shell.showMessage({
+      title: 'Which one?',
+      text: 'Pick one.',
+      options: [
+        { id: 'A.EXE', label: 'A.EXE', detail: '1 KB', onClick: () => seen.push('A.EXE') },
+        { id: 'B/B.EXE', label: 'B\\B.EXE', detail: '2 KB', current: true, onClick: () => seen.push('B/B.EXE') },
+      ],
+      actions: [{ id: 'back', label: 'Close', onClick: () => seen.push('back') }],
+    });
+    expect(document.querySelector('.rx-overlay').hidden).toBe(false);
+    expect(card().classList.contains('rx-card--options')).toBe(true);
+    expect(card().getAttribute('role')).toBe('dialog');
+    expect(card().getAttribute('aria-modal')).toBe('true');
+    expect(document.getElementById(card().getAttribute('aria-labelledby')).textContent).toBe('Which one?');
+    expect([...card().children].map((n) => n.className)).toEqual(['rx-card__title', 'rx-card__text', 'rx-card__options', 'rx-card__actions']);
+    expect(card().querySelector('.rx-card__options').getAttribute('role')).toBe('list');
+    expect(
+      options().map((b) => [
+        b.className,
+        b.getAttribute('type'),
+        b.getAttribute('role'),
+        b.dataset.option,
+        b.querySelector('.rx-option__label').textContent,
+        b.querySelector('.rx-option__detail').textContent,
+        b.getAttribute('aria-current'),
+      ]),
+    ).toEqual([
+      ['rx-btn rx-option', 'button', 'listitem', 'A.EXE', 'A.EXE', '1 KB', null],
+      ['rx-btn rx-option', 'button', 'listitem', 'B/B.EXE', 'B\\B.EXE', '2 KB', 'true'],
+    ]);
+    expect(document.activeElement).toBe(options()[1]);
+    options()[0].click();
+    card().querySelector('[data-action="back"]').click();
+    expect(seen).toEqual(['A.EXE', 'back']);
+  });
+
+  it('focuses the first option when none is current; a card without options stays as it was', async () => {
+    const shell = await startShell({ view: 'dos', connect: async () => fakeFx() });
+    shell.showMessage({ title: 'Which one?', options: [{ label: 'A' }, { label: 'B' }], className: 'rx-test-pick' });
+    expect(document.activeElement).toBe(options()[0]);
+    expect(options()[0].querySelector('.rx-option__detail')).toBe(null);
+    expect(card().classList.contains('rx-test-pick')).toBe(true);
+    shell.showMessage({ title: 'Saved', text: 'Done.', actions: [{ id: 'ok', label: 'OK', onClick() {} }] });
+    expect(card().className).toBe('rx-card');
+    expect(card().querySelector('.rx-card__options')).toBe(null);
+    expect(card().hasAttribute('role')).toBe(false);
+    expect(card().hasAttribute('aria-labelledby')).toBe(false);
+    expect(document.activeElement).toBe(card().querySelector('[data-action="ok"]'));
+  });
+
+  it('answers Escape only when the message says what Escape does', async () => {
+    const shell = await startShell({ view: 'dos', connect: async () => fakeFx() });
+    const seen = [];
+    const esc = () => card().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    shell.showMessage({ title: 'Which one?', options: [{ label: 'A' }] });
+    expect(esc()).toBe(true);
+    shell.showMessage({ title: 'Which one?', options: [{ label: 'A' }], onEscape: () => seen.push('escape') });
+    expect(esc()).toBe(false);
+    expect(seen).toEqual(['escape']);
+    shell.hideOverlay();
+    document.querySelector('.rx-overlay').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(seen).toEqual(['escape']);
+  });
+
+  it('draws the options again in the new language', async () => {
+    const fx = fakeFx({ locale: 'tr' });
+    const shell = await startShell({ view: 'dos', strings: viewStrings, connect: async () => fx });
+    shell.showMessage((tt) => ({ title: tt('test.music'), options: [{ id: 'm', label: tt('test.music'), detail: tt('test.sfx'), current: true }] }));
+    expect(options()[0].querySelector('.rx-option__label').textContent).toBe('Müzik');
+    fx.emit('locale', { locale: 'en', dir: 'ltr' });
+    expect(options()[0].querySelector('.rx-option__label').textContent).toBe('Music');
+    expect(options()[0].querySelector('.rx-option__detail').textContent).toBe('Sound effects');
+    expect(options()[0].getAttribute('aria-current')).toBe('true');
   });
 });
 

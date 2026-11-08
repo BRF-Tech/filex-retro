@@ -1,5 +1,5 @@
 // The DOS player (view `dos`): opens a js-dos bundle (`.jsdos`), checks it,
-// and runs it in js-dos 8.5.1's DOSBox, drawn by this page (its own screen,
+// and runs it in js-dos 8.5.2's DOSBox, drawn by this page (its own screen,
 // sound and keys; not the js-dos player's interface).
 //
 //   open -> read the bytes (file.read as bytes) -> a zip? what is in it?
@@ -186,11 +186,10 @@ async function main() {
   };
   updateSave();
 
-  // Unsaved changes: filex asks before the person leaves them. Also
-  // `<html data-rx-dirty>`, for the person's browser tools and the tests.
+  // Unsaved changes: the shell tells filex (it asks before the person leaves
+  // them) and marks `<html data-rx-dirty>`.
   const markDirty = (on) => {
     shell.setDirty(on);
-    document.documentElement.dataset.rxDirty = String(!!on);
     updateSave();
   };
 

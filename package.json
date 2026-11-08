@@ -1,6 +1,6 @@
 {
   "name": "filex-retro",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Retro: a filex app that plays DOOM-engine WADs and js-dos bundles in place of the preview",
   "license": "GPL-2.0-only",
@@ -10,10 +10,10 @@
   },
   "dependencies": {
     "@brftech/filex-app-ui": "0.50.0",
-    "emulators": "8.5.1"
+    "emulators": "8.5.2"
   },
   "devDependencies": {
-    "happy-dom": "20.14.5",
-    "vitest": "5.0.3"
+    "happy-dom": "21.0.4",
+    "vitest": "5.1.0"
   }
 }

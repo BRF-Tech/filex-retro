@@ -9,7 +9,7 @@ and it runs, inside the sandbox filex draws for every app interface.
 | Player | Opens | Engine |
 |---|---|---|
 | **DOOM-engine player** | `.wad` (an IWAD) and `.fxdoom` (this app's pack: a game with its saved games) | [doomgeneric](https://github.com/ozkl/doomgeneric) (Chocolate Doom's engine) compiled to WebAssembly, with Chocolate Doom's OPL music |
-| **DOS player** | `.jsdos` (a [js-dos](https://js-dos.com) bundle, or a zip of a DOS game's folder) | js-dos 8.5.1's emulator (DOSBox compiled to WebAssembly), with Retro's own screen, sound and keys |
+| **DOS player** | `.jsdos` (a [js-dos](https://js-dos.com) bundle, or a zip of a DOS game's folder) | js-dos 8.5.2's emulator (DOSBox compiled to WebAssembly), with Retro's own screen, sound and keys |
 
 Retro needs **filex 0.51.0 or newer**: keeping saved games writes a new file
 through filex's own save dialog, which apps can use from 0.51.0 on.
@@ -19,7 +19,7 @@ through filex's own save dialog, which apps can use from 0.51.0 on.
 In filex's admin panel, open **Plugins** (System, Plugins & integrations),
 the **Apps** tab, then **Install an app → GitHub repository**. Enter the
 repository `BRF-Tech/filex-retro` and, for a particular version, its tag as
-the ref (`v0.1.0`). filex reads [`filex-app.json`](filex-app.json), downloads
+the ref (`v0.2.0`). filex reads [`filex-app.json`](filex-app.json), downloads
 `ui.zip` from this repository's release and checks it against the sha256
 the manifest pins; a package that does not match is refused. filex lists
 what Retro asks for ([Permissions](#permissions)) before anything is
@@ -125,7 +125,7 @@ they apply at once. With music off, the OPL chip is not emulated at all.
 Open a js-dos bundle (`.jsdos`) and press **Start**. A js-dos bundle is a zip
 of a DOS game's folder with `.jsdos/dosbox.conf` in it, the DOSBox
 configuration whose `[autoexec]` starts the game; the bundles made for
-[js-dos](https://js-dos.com) are this kind. DOS runs in js-dos 8.5.1's
+[js-dos](https://js-dos.com) are this kind. DOS runs in js-dos 8.5.2's
 emulator (DOSBox compiled to WebAssembly), and Retro draws it itself: its own
 screen, sound, keyboard and mouse, in filex's colours and your language. The
 js-dos player's own interface, and its cloud features, are not part of it.
@@ -195,14 +195,14 @@ a deterministic `ui.zip`.
 
 ```bash
 npm ci                         # the filex app SDK (@brftech/filex-app-ui), js-dos's emulators and the test tools
-scripts/build-engine.sh        # the DOOM engine, in emscripten/emsdk:6.0.10 (Docker)
+scripts/build-engine.sh        # the DOOM engine, in emscripten/emsdk:7.0.0 (Docker)
 scripts/build.sh               # ui.zip and ui.zip.sha256
 scripts/build.sh --stamp       # ... and writes the sha256 into filex-app.json
 scripts/build.sh --check       # ... and fails unless filex-app.json names it
 ```
 
 `engines/doom/build.sh` clones
-[ozkl/doomgeneric](https://github.com/ozkl/doomgeneric) at `dcb7a8d` and
+[ozkl/doomgeneric](https://github.com/ozkl/doomgeneric) at `e257a09` and
 [Chocolate Doom](https://github.com/chocolate-doom/chocolate-doom) at
 `chocolate-doom-3.1.1` (only its OPL music and the Nuked OPL3 emulator),
 applies `engines/doom/patches/`, and links them with Retro's platform layer
@@ -220,11 +220,11 @@ unless the sha256 is the one `filex-app.json` pins, and attaches `ui.zip`,
 `ui.zip.sha256` and `filex-app.json` to the GitHub release, with that
 version's `CHANGELOG.md` section as its notes.
 
-The DOS engine is not built here: it is js-dos 8.5.1's `emulators` package
+The DOS engine is not built here: it is js-dos 8.5.2's `emulators` package
 from npm, pinned by `package-lock.json` and packed unchanged, only the
 single-threaded DOSBox (`wdosbox`) and its zip library (`wlibzip`). Its
 source is [caiiiycuk/emulators](https://github.com/caiiiycuk/emulators) at
-`v8.5.1` ([NOTICE](NOTICE), item 6).
+`v8.5.2` ([NOTICE](NOTICE), item 6).
 
 ## Tests
 
