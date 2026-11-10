@@ -4,6 +4,12 @@ All notable changes to this app are written here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- js-dos emulators 8.5.3 (was 8.5.2).
+
 ## [0.2.0] - 2026-11-08
 
 The engines move to their newest upstream versions. Nothing changes in how

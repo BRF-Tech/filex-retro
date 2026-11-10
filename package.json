@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@brftech/filex-app-ui": "0.50.0",
-    "emulators": "8.5.2"
+    "emulators": "8.5.3"
   },
   "devDependencies": {
     "happy-dom": "21.0.4",

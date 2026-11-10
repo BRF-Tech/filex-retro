@@ -57,7 +57,7 @@
   "ui": {
     "bundle": {
       "url": "https://github.com/BRF-Tech/filex-retro/releases/download/{tag}/ui.zip",
-      "sha256": "69ceefef964961d1db866bc1dd401955562ac0b52eefd2d2dc87096b6c1de394"
+      "sha256": "473116bd0fcdb79d49c0804a329eb2c55c07c9a1ee4f03f00d195cb2da52b12c"
     },
     "csp": [
       "wasm-unsafe-eval"

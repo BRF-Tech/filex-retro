@@ -44,9 +44,9 @@ is packed unchanged, as its authors published it; its source is named there.
    app interface SDK. Copyright (c) 2026 BRF Tech. MIT licence
    (licenses/filex-app-ui.txt).
 
-6. js-dos emulators 8.5.2 (dos/emulators/: emulators.js, wdosbox.js and .wasm,
+6. js-dos emulators 8.5.3 (dos/emulators/: emulators.js, wdosbox.js and .wasm,
    wlibzip.js and .wasm), the DOS player's engine, packed exactly as
-   published on npm as "emulators" 8.5.2 (package-lock.json pins its
+   published on npm as "emulators" 8.5.3 (package-lock.json pins its
    integrity). Copyright (C) Alexander Guryanov (caiiiycuk). GNU General
    Public License, version 2 (LICENSE). Its source is
    https://github.com/caiiiycuk/emulators at tag v8.5.2 (commit
