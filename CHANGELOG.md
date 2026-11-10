@@ -6,6 +6,8 @@ All notable changes to this app are written here. The format follows
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-10
+
 ### Changed
 
 - js-dos emulators 8.5.3 (was 8.5.2).

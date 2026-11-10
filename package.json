@@ -1,6 +1,6 @@
 {
   "name": "filex-retro",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Retro: a filex app that plays DOOM-engine WADs and js-dos bundles in place of the preview",
   "license": "GPL-2.0-only",
