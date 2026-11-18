@@ -6,6 +6,10 @@ All notable changes to this app are written here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- vitest 5.1.1 (was 5.1.0).
+
 ## [0.2.1] - 2026-11-10
 
 ### Changed
