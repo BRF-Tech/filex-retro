@@ -29,7 +29,12 @@ LOCK=${LOCK:-$ROOT/.build.lock}
 CACHE=${RETRO_CACHE:-$ROOT/cache}
 ENGINE_OUT=${ENGINE_OUT:-$ROOT/out/engine}
 FILEX_IMAGE=${FILEX_IMAGE:-ghcr.io/brf-tech/filex:v0.51.0}
-PWIMG=mcr.microsoft.com/playwright:v1.65.0-noble
+# Playwright's image is the version e2e/package.json pins: the driver's client and the image's
+# browsers must be the same release, so a bump of the package alone ran 1.65.1 against
+# 1.65.0's browsers ("Executable doesn't exist", filex Roadmap #375).
+PW_VERSION=$(sed -n 's/^[[:space:]]*"playwright":[[:space:]]*"\([0-9][0-9.]*\)".*/\1/p' "$(dirname "$0")/package.json" | head -n 1)
+[ -n "$PW_VERSION" ] || { echo "e2e/package.json pins no exact playwright version" >&2; exit 1; }
+PWIMG=mcr.microsoft.com/playwright:v$PW_VERSION-noble
 NODEIMG=node:22
 ALPINE=alpine:3.24
 NAME=${E2E_NAME:-side-retro-doom}
